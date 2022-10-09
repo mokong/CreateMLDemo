@@ -15,7 +15,7 @@ class DrawingBoxesView: UIView {
     }
 
     func drawBox(with predictions: [VNRecognizedObjectObservation]) {
-        removeBox()
+//        removeBox()
         
         predictions.forEach { drawBox(with: $0) }
     }

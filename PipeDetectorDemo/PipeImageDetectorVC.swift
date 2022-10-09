@@ -43,7 +43,7 @@ class PipeImageDetectorVC: UIViewController {
     }
     
     fileprivate func setupCoreMLRequest() {
-        guard let model = try? PipeObjectDetector(configuration: MLModelConfiguration()).model,
+        guard let model = try? pipe_output(configuration: MLModelConfiguration()).model,
               let visionModel = try? VNCoreMLModel(for: model) else {
             return
         }
@@ -66,6 +66,10 @@ class PipeImageDetectorVC: UIViewController {
     }
     
     fileprivate func setupRandomLoadBtn() {
+        drawingBoxesView?.removeBox()
+        drawingBoxesView = nil
+        setupBoxesView()
+        
         randomLoadBtn.setTitle("随机加载一张图片", for: .normal)
         randomLoadBtn.setTitleColor(UIColor.blue, for: .normal)
         view.addSubview(randomLoadBtn)
@@ -83,13 +87,24 @@ class PipeImageDetectorVC: UIViewController {
     
     // MARK: - action
     fileprivate func handleVMRequestDidComplete(_ request: VNRequest, error: Error?) {
+        drawingBoxesView?.removeBox()
+
         let results = request.results as? [VNRecognizedObjectObservation]
         DispatchQueue.main.async {
-            if let prediction = results?.first {
-                self.drawingBoxesView?.drawBox(with: [prediction])
-            } else {
-                self.drawingBoxesView?.removeBox()
-            }
+//            for prediction in results! {
+//                print(prediction)
+//                if prediction.confidence > 0.5 {
+//                    self.drawingBoxesView?.drawBox(with: results!)
+//                }
+//            }
+            
+            self.drawingBoxesView?.drawBox(with: results!)
+
+//            if let prediction = results?.first {
+//                self.drawingBoxesView?.drawBox(with: [prediction])
+//            } else {
+//                self.drawingBoxesView?.removeBox()
+//            }
         }
     }
     
@@ -111,5 +126,10 @@ class PipeImageDetectorVC: UIViewController {
         let randomNum = arc4random_uniform(maxNum - minNum) + minNum
         let imageName = "images-\(randomNum).jpeg"
         return imageName
+//        let maxNum: UInt32 = 14
+//        let minNum: UInt32 = 1
+//        let randomNum = arc4random_uniform(maxNum - minNum) + minNum
+//        let imageName = "image\(randomNum).png"
+//        return imageName
     }    
 }
